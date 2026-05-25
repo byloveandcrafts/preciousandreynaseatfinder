@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Find Your Seat · Precious & Reyna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Blue Pantone Palette */
+  --blue-deep:    #1B3A6B;   /* Pantone 281 C – navy anchor */
+  --blue-mid:     #2E5FA3;   /* Pantone 286 C – rich royal */
+  --blue-bright:  #4A90D9;   /* Pantone 2925 C – sky pop */
+  --blue-soft:    #A8C5E8;   /* Pantone 2707 C – powder */
+  --blue-pale:    #D6E8F7;   /* lightest tint */
+  --blue-wash:    #EEF5FC;   /* page wash */
+  --silver:       #C8D6E5;
+  --silver-dark:  #7A9BB5;
+  --white:        #F8FBFF;
+  --text:         #0F2A4A;
+  --text-light:   #4A6B8A;
+
+  --shadow-soft:  0 20px 60px rgba(27,58,107,0.18), 0 4px 16px rgba(27,58,107,0.10);
+  --shadow-hover: 0 32px 80px rgba(27,58,107,0.28), 0 8px 24px rgba(27,58,107,0.16);
+  --t: 0.32s cubic-bezier(0.4,0,0.2,1);
+
+  --font-display: 'Great Vibes', cursive;
+  --font-serif:   'Playfair Display', serif;
+  --font-body:    'Cormorant Garamond', serif;
+  --font-sans:    'Montserrat', sans-serif;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;scroll-behavior:smooth;}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  background: var(--blue-wash);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ── BACKGROUND ── */
+body::before {
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 20%, rgba(74,144,217,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 85% 80%, rgba(27,58,107,0.15) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 40% at 50% 50%, rgba(214,232,247,0.55) 0%, transparent 80%);
+  pointer-events:none;
+}
+body::after {
+  content:'';position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(74,144,217,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74,144,217,0.045) 1px, transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+}
+
+/* ── FLOATING STARS / SPARKLES ── */
+.sparkle {
+  position:fixed;pointer-events:none;z-index:0;
+  opacity:0;
+  font-size:12px;
+  animation:sparkleFall linear infinite;
+}
+@keyframes sparkleFall {
+  0%   { opacity:0; transform:translateY(-30px) rotate(0deg) scale(0.5); }
+  8%   { opacity:0.4; }
+  92%  { opacity:0.15; }
+  100% { opacity:0; transform:translateY(110vh) rotate(480deg) scale(1.2); }
+}
+
+/* ── CANVAS ── */
+#star-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;}
+
+/* ── FIREBASE STATUS ── */
+.fb-status {
+  position:fixed;top:14px;right:14px;z-index:999;
+  width:9px;height:9px;border-radius:50%;
+  transition:background 0.4s, box-shadow 0.4s;
+}
+.fb-status.synced  { background:#4ADE80; box-shadow:0 0 6px rgba(74,222,128,0.7); }
+.fb-status.syncing { background:#F9C84B; box-shadow:0 0 6px rgba(249,200,75,0.7); animation:pulse 0.9s infinite; }
+.fb-status.offline { background:#F87171; box-shadow:0 0 6px rgba(248,113,113,0.7); }
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ── HEADER ── */
+.sf-header {
+  position:relative;z-index:2;
+  width:100%;
+  background:rgba(27,58,107,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(74,144,217,0.35);
+  padding:2.4rem 1.5rem 2.1rem;
+  text-align:center;
+  flex-shrink:0;
+  overflow:hidden;
+}
+.sf-header::before {
+  content:'';position:absolute;inset:0;
+  background: linear-gradient(160deg, rgba(74,144,217,0.25) 0%, transparent 60%);
+  pointer-events:none;
+}
+.sf-header::after {
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--blue-bright),transparent);
+}
+.sf-header-eyebrow {
+  font-family:var(--font-sans);
+  font-size:0.52rem;letter-spacing:0.42em;text-transform:uppercase;
+  color:var(--blue-soft);opacity:0.85;
+  margin-bottom:0.5rem;
+  animation:fadeDown 0.8s 0.1s ease both;
+}
+.sf-deco-line {
+  display:flex;align-items:center;justify-content:center;gap:0.8rem;
+  margin-bottom:0.7rem;
+  animation:fadeDown 0.8s 0.15s ease both;
+}
+.sf-deco-line span { font-family:var(--font-sans);font-size:0.42rem;letter-spacing:0.25em;color:rgba(168,197,232,0.5); }
+.sf-deco-line::before,.sf-deco-line::after { content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(74,144,217,0.4));max-width:60px; }
+.sf-deco-line::after{transform:scaleX(-1);}
+.sf-header-title {
+  font-family:var(--font-display);
+  font-size:clamp(2.4rem,8vw,3.6rem);
+  color:#ffffff;
+  line-height:1.1;
+  text-shadow: 0 2px 20px rgba(74,144,217,0.5);
+  animation:fadeDown 0.8s 0.2s ease both;
+}
+.sf-header-sub {
+  font-family:var(--font-sans);
+  font-size:clamp(0.5rem,1.5vw,0.6rem);
+  letter-spacing:0.5em;text-transform:uppercase;
+  color:var(--blue-soft);
+  margin-top:0.4rem;
+  animation:fadeDown 0.8s 0.28s ease both;
+}
+.sf-header-date {
+  font-family:var(--font-sans);
+  font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(168,197,232,0.55);
+  margin-top:0.6rem;
+  animation:fadeDown 0.8s 0.35s ease both;
+}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── MAIN ── */
+.sf-main {
+  position:relative;z-index:2;
+  width:100%;max-width:520px;
+  padding:2.5rem 1.5rem 4rem;
+  flex:1;
+  display:flex;flex-direction:column;
+  gap:0;
+}
+
+/* ── RIBBON DECO ── */
+.sf-ribbon-deco {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.6rem;
+  padding:0.9rem 1.3rem;
+  background:rgba(74,144,217,0.07);
+  border:1px solid rgba(74,144,217,0.2);
+  border-radius:10px;
+  animation:fadeUp 0.7s 0.3s ease both;
+}
+.sf-rd-side { text-align:center; }
+.sf-rd-label {
+  font-family:var(--font-body);font-size:1.15rem;font-style:italic;
+  color:var(--blue-mid);letter-spacing:0.04em;
+}
+.sf-rd-sub {
+  font-family:var(--font-sans);font-size:0.46rem;
+  color:rgba(15,42,74,0.4);margin-top:0.1rem;letter-spacing:0.18em;text-transform:uppercase;
+}
+.sf-rd-arrow {
+  display:flex;flex-direction:column;align-items:center;gap:0.2rem;
+  color:rgba(74,144,217,0.45);
+}
+.sf-rd-arrow span { font-family:var(--font-sans);font-size:0.38rem;letter-spacing:0.2em;color:rgba(74,144,217,0.35);text-transform:uppercase; }
+
+/* ── SEARCH ── */
+.sf-search-wrap { animation:fadeUp 0.7s 0.4s ease both; }
+.sf-instruction {
+  font-family:var(--font-body);
+  font-size:1.05rem;font-style:italic;
+  color:rgba(15,42,74,0.6);
+  text-align:center;
+  margin-bottom:1.2rem;line-height:1.65;
+}
+.sf-search-box {
+  display:flex;align-items:center;gap:0.8rem;
+  background:var(--white);
+  border:2px solid rgba(74,144,217,0.3);
+  border-radius:10px;
+  padding:1rem 1.4rem;
+  box-shadow:0 8px 32px rgba(27,58,107,0.1), 0 0 0 4px rgba(74,144,217,0.05);
+  transition:all var(--t);
+}
+.sf-search-box:focus-within {
+  border-color:var(--blue-bright);
+  box-shadow:0 8px 40px rgba(27,58,107,0.18), 0 0 0 4px rgba(74,144,217,0.1);
+}
+.sf-search-icon { color:var(--blue-mid);flex-shrink:0; }
+.sf-input {
+  flex:1;background:transparent;border:none;outline:none;
+  font-family:var(--font-body);
+  font-size:1.2rem;font-style:italic;
+  color:var(--text);caret-color:var(--blue-bright);
+}
+.sf-input::placeholder{color:var(--silver-dark);font-style:italic;}
+.sf-clear {
+  background:none;border:none;cursor:pointer;
+  color:var(--silver-dark);font-size:0.9rem;
+  padding:0.2rem;line-height:1;
+  transition:color var(--t);flex-shrink:0;
+  display:none;
+}
+.sf-clear.visible{display:block;}
+.sf-clear:hover{color:var(--text);}
+
+/* View all tables btn */
+.sf-view-tables-btn {
+  display:flex;align-items:center;justify-content:center;gap:0.6rem;
+  background:rgba(74,144,217,0.07);
+  border:1px solid rgba(74,144,217,0.22);
+  border-radius:8px;
+  padding:0.7rem 1.3rem;
+  font-family:var(--font-sans);
+  font-size:0.55rem;letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(15,42,74,0.5);
+  cursor:pointer;
+  transition:all var(--t);
+  margin:0 auto 1.5rem;
+  width:100%;
+}
+.sf-view-tables-btn:hover {
+  border-color:rgba(74,144,217,0.5);
+  color:var(--blue-mid);
+  background:rgba(74,144,217,0.13);
+}
+
+/* ── RESULTS ── */
+.sf-results { display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem; }
+
+/* ── RESULT CARD ── */
+.sf-result-card {
+  background:var(--white);
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:var(--shadow-soft);
+  animation:cardIn 0.4s ease both;
+  position:relative;
+  border:1px solid rgba(74,144,217,0.15);
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sf-result-card::before,
+.sf-result-card::after {
+  content:'';
+  position:absolute;
+  top:50%;transform:translateY(-50%);
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--blue-wash);
+  z-index:2;
+}
+.sf-result-card::before { left:-7px; }
+.sf-result-card::after  { right:-7px; }
+
+.sf-card-top {
+  background:linear-gradient(135deg,var(--blue-deep) 0%,var(--blue-mid) 60%,var(--blue-bright) 100%);
+  padding:1.4rem 1.8rem 1.2rem;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+  position:relative;
+  border-bottom:2px dashed rgba(255,255,255,0.2);
+}
+.sf-card-top-inner { flex:1; }
+.sf-card-label {
+  font-family:var(--font-sans);
+  font-size:0.46rem;letter-spacing:0.28em;text-transform:uppercase;
+  color:rgba(248,251,255,0.6);margin-bottom:0.22rem;
+}
+.sf-card-name {
+  font-family:var(--font-serif);
+  font-size:1.65rem;font-weight:400;color:#ffffff;
+  line-height:1.2;font-style:italic;
+}
+
+/* Table badge */
+.sf-badge {
+  background:rgba(255,255,255,0.12);
+  border:1.5px solid rgba(255,255,255,0.45);
+  color:#ffffff;
+  border-radius:8px;padding:0.38rem 0.9rem;
+  font-family:var(--font-sans);
+  font-size:0.52rem;letter-spacing:0.18em;text-transform:uppercase;
+  white-space:nowrap;align-self:flex-start;margin-top:0.1rem;
+  flex-shrink:0;
+}
+.sf-badge-label {
+  font-size:0.38rem;letter-spacing:0.2em;color:rgba(255,255,255,0.55);
+  text-transform:uppercase;font-family:var(--font-sans);
+  display:block;margin-bottom:0.1rem;text-align:center;
+}
+.sf-badge-value { font-size:0.75rem;font-weight:500;display:block;text-align:center; }
+
+.sf-companions {
+  padding:1.2rem 1.8rem 1.4rem;
+  background:var(--blue-pale);
+  position:relative;
+}
+.sf-companions::before {
+  content:'';position:absolute;top:0;left:1.8rem;right:1.8rem;
+  border-top:1px dashed rgba(74,144,217,0.2);
+}
+.sf-comp-label {
+  font-family:var(--font-sans);
+  font-size:0.48rem;letter-spacing:0.24em;text-transform:uppercase;
+  color:var(--silver-dark);margin-bottom:0.8rem;
+  display:flex;align-items:center;gap:0.6rem;
+}
+.sf-comp-label::after{content:'';flex:1;height:1px;background:rgba(74,144,217,0.15);}
+.sf-pills{display:flex;flex-wrap:wrap;gap:0.45rem;}
+.sf-pill {
+  background:var(--white);
+  border:1px solid rgba(74,144,217,0.2);
+  border-radius:6px;padding:0.28rem 0.75rem;
+  font-family:var(--font-body);font-size:0.88rem;color:var(--text);
+  display:flex;align-items:center;gap:0.35rem;
+}
+.sf-pill::before { content:'✦';font-size:0.45rem;color:var(--blue-bright);flex-shrink:0; }
+
+/* ── EMPTY STATE ── */
+.sf-empty {
+  text-align:center;padding:2.5rem 0;
+  animation:fadeUp 0.4s ease both;
+}
+.sf-empty-icon{font-size:2.2rem;color:rgba(74,144,217,0.3);margin-bottom:0.8rem;}
+.sf-empty-text {
+  font-family:var(--font-body);font-style:italic;
+  font-size:1.05rem;color:rgba(15,42,74,0.5);
+}
+.sf-empty-sub {
+  font-family:var(--font-sans);font-size:0.72rem;
+  color:rgba(15,42,74,0.3);margin-top:0.5rem;line-height:1.6;
+}
+
+/* ── IDLE STATE ── */
+.sf-idle {
+  text-align:center;padding:2.5rem 0 1rem;
+  animation:fadeUp 0.6s 0.6s ease both;
+}
+.sf-idle-text {
+  font-family:var(--font-body);font-style:italic;
+  font-size:1.05rem;color:rgba(15,42,74,0.55);line-height:1.7;
+}
+
+/* ── FOOTER ── */
+.sf-footer {
+  position:relative;z-index:2;
+  width:100%;
+  text-align:center;
+  padding:1.5rem;
+  border-top:1px solid rgba(74,144,217,0.18);
+  background:rgba(27,58,107,0.07);
+  backdrop-filter:blur(8px);
+  margin-top:auto;
+}
+.sf-footer-logo {
+  font-family:var(--font-display);
+  font-size:2.1rem;color:var(--blue-mid);
+  margin-bottom:0.2rem;
+}
+.sf-footer-date {
+  font-family:var(--font-sans);
+  font-size:0.48rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(15,42,74,0.35);
+}
+
+/* ── ADMIN OVERLAY ── */
+#admin-overlay {
+  position:fixed;inset:0;z-index:900;
+  background:rgba(15,42,74,0.75);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;
+}
+#admin-overlay.hidden{display:none;}
+.admin-panel {
+  background:var(--white);
+  border-radius:18px 18px 0 0;
+  padding:2rem 1.5rem 3rem;
+  width:100%;max-width:540px;
+  max-height:92vh;overflow-y:auto;
+  box-shadow:0 -10px 50px rgba(15,42,74,0.4);
+  animation:sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.admin-handle {
+  width:40px;height:4px;background:rgba(74,144,217,0.2);
+  border-radius:2px;margin:0 auto 1.6rem;
+}
+.admin-title {
+  font-family:var(--font-serif);font-size:1.45rem;color:var(--text);
+  font-style:italic;margin-bottom:1.3rem;
+}
+.afield{display:flex;flex-direction:column;gap:0.3rem;margin-bottom:0.9rem;}
+.afield label {
+  font-family:var(--font-sans);
+  font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue-mid);
+}
+.afield input {
+  background:var(--blue-pale);border:1px solid rgba(74,144,217,0.22);
+  border-radius:8px;padding:0.65rem 0.9rem;
+  font-family:var(--font-body);font-size:0.95rem;color:var(--text);
+  outline:none;transition:border-color var(--t);
+}
+.afield input:focus{border-color:var(--blue-bright);}
+.afield input::placeholder{color:var(--silver-dark);}
+.btn-add-guest {
+  background:linear-gradient(135deg,var(--blue-deep),var(--blue-mid));
+  color:#fff;border:none;
+  padding:0.75rem 1.6rem;border-radius:10px;
+  font-family:var(--font-sans);font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;
+  cursor:pointer;transition:all var(--t);margin-bottom:1.5rem;
+  box-shadow:0 4px 20px rgba(27,58,107,0.35);
+}
+.btn-add-guest:hover{opacity:0.9;transform:translateY(-1px);}
+
+.admin-list-wrap { display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem; }
+.admin-row {
+  display:flex;align-items:center;gap:0.8rem;
+  padding:0.6rem 0.9rem;
+  background:var(--blue-pale);border:1px solid rgba(74,144,217,0.15);
+  border-radius:10px;
+}
+.admin-row-name{font-family:var(--font-body);font-size:0.95rem;color:var(--text);flex:1;font-weight:600;}
+.admin-row-meta{font-family:var(--font-sans);font-size:0.62rem;color:var(--silver-dark);}
+.btn-edit {
+  background:none;border:1px solid rgba(74,144,217,0.25);
+  border-radius:5px;color:var(--blue-mid);
+  width:26px;height:26px;font-size:0.6rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all var(--t);flex-shrink:0;
+}
+.btn-edit:hover{background:rgba(74,144,217,0.12);border-color:var(--blue-bright);}
+.btn-del {
+  background:none;border:1px solid rgba(74,144,217,0.15);
+  border-radius:5px;color:var(--silver-dark);
+  width:26px;height:26px;font-size:0.65rem;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all var(--t);flex-shrink:0;
+}
+.btn-del:hover{border-color:#b94040;color:#b94040;}
+
+/* admin search */
+.admin-search-row {
+  display:flex;align-items:center;gap:0.5rem;
+  background:var(--blue-pale);border:1px solid rgba(74,144,217,0.2);
+  border-radius:8px;padding:0.5rem 0.85rem;margin-bottom:0.65rem;
+}
+.admin-search-input {
+  flex:1;border:none;background:transparent;outline:none;
+  font-family:var(--font-body);font-size:0.95rem;color:var(--text);
+}
+.admin-search-input::placeholder{color:var(--silver-dark);}
+
+.admin-footer {
+  display:flex;flex-wrap:wrap;gap:0.5rem;
+  border-top:1px solid rgba(74,144,217,0.12);padding-top:1rem;
+}
+.abtn {
+  font-family:var(--font-sans);font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;
+  padding:0.52rem 1rem;border-radius:8px;cursor:pointer;transition:all var(--t);
+}
+.abtn-export{background:none;border:1px solid var(--blue-mid);color:var(--blue-mid);}
+.abtn-export:hover{background:var(--blue-mid);color:#fff;}
+.abtn-import{background:none;border:1px solid rgba(74,144,217,0.35);color:var(--text-light);}
+.abtn-import:hover{background:rgba(74,144,217,0.1);}
+.abtn-clear{background:none;border:1px solid rgba(74,144,217,0.2);color:var(--silver-dark);}
+.abtn-clear:hover{border-color:#b94040;color:#b94040;}
+.abtn-close{background:linear-gradient(135deg,var(--blue-deep),var(--blue-mid));border:none;color:#fff;}
+.abtn-close:hover{opacity:0.9;}
+
+/* ── EDIT MODAL ── */
+#edit-modal {
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(15,42,74,0.8);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+}
+#edit-modal.hidden{display:none;}
+.edit-modal-box {
+  background:var(--white);border-radius:16px;padding:2rem 1.8rem;
+  width:100%;max-width:440px;
+  box-shadow:var(--shadow-hover);
+  animation:modalIn 0.3s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
+.edit-modal-title {
+  font-family:var(--font-serif);font-size:1.25rem;color:var(--text);
+  font-style:italic;margin-bottom:1.2rem;
+  padding-bottom:0.8rem;
+  border-bottom:1px solid rgba(74,144,217,0.15);
+}
+.edit-modal-actions{display:flex;gap:0.6rem;margin-top:1.2rem;flex-wrap:wrap;}
+.btn-save-edit {
+  background:linear-gradient(135deg,var(--blue-deep),var(--blue-mid));
+  color:#fff;border:none;
+  padding:0.65rem 1.4rem;border-radius:8px;
+  font-family:var(--font-sans);font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;
+  cursor:pointer;transition:all var(--t);
+}
+.btn-save-edit:hover{opacity:0.9;}
+.btn-cancel-edit {
+  background:none;border:1px solid rgba(74,144,217,0.25);color:var(--text-light);
+  padding:0.65rem 1.4rem;border-radius:8px;
+  font-family:var(--font-sans);font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;
+  cursor:pointer;transition:all var(--t);
+}
+.btn-cancel-edit:hover{background:rgba(74,144,217,0.07);}
+
+/* ── TABLES OVERLAY ── */
+#tables-overlay {
+  position:fixed;inset:0;z-index:900;
+  background:rgba(15,42,74,0.75);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:center;
+  animation:fadeOverlay 0.25s ease;
+}
+@keyframes fadeOverlay{from{opacity:0;}to{opacity:1;}}
+@media(min-height:600px){ #tables-overlay{align-items:center;} }
+#tables-overlay.hidden{display:none;}
+
+.tables-panel {
+  background:var(--white);
+  border-radius:18px 18px 0 0;
+  padding:2rem 1.5rem 2.8rem;
+  width:100%;max-width:600px;
+  max-height:88vh;overflow-y:auto;
+  display:flex;flex-direction:column;gap:1.5rem;
+  box-shadow:0 -10px 50px rgba(15,42,74,0.35);
+  animation:sheetUp 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+@media(min-height:600px){
+  .tables-panel{border-radius:18px;max-height:85vh;}
+}
+.tables-panel-header {
+  display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+}
+.tables-eyebrow {
+  font-family:var(--font-sans);
+  font-size:0.52rem;letter-spacing:0.26em;text-transform:uppercase;
+  color:var(--blue-mid);margin-bottom:0.22rem;
+}
+.tables-title {
+  font-family:var(--font-serif);
+  font-weight:400;font-size:1.65rem;
+  color:var(--text);font-style:italic;
+}
+.tables-close {
+  background:var(--blue-pale);border:1px solid rgba(74,144,217,0.2);
+  border-radius:50%;width:34px;height:34px;
+  font-size:0.75rem;color:var(--text-light);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all var(--t);
+}
+.tables-close:hover{background:rgba(74,144,217,0.12);color:var(--text);}
+.tables-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+}
+@media(max-width:400px){.tables-grid{grid-template-columns:1fr;}}
+.table-card {
+  background:var(--blue-pale);border:1px solid rgba(74,144,217,0.18);
+  border-radius:12px;overflow:hidden;
+  box-shadow:0 2px 12px rgba(27,58,107,0.1);
+  animation:cardIn 0.35s ease both;
+}
+.table-card-header {
+  background:linear-gradient(135deg,var(--blue-deep),var(--blue-mid));
+  padding:0.7rem 1rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.table-card-name {
+  font-family:var(--font-sans);
+  font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:#fff;
+}
+.table-card-count {
+  font-family:var(--font-sans);font-size:0.58rem;color:rgba(255,255,255,0.55);
+}
+.table-card-guests {
+  padding:0.8rem 1rem;display:flex;flex-direction:column;gap:0.38rem;
+}
+.table-guest-row {
+  display:flex;align-items:center;gap:0.5rem;
+  padding:0.28rem 0;border-bottom:1px solid rgba(74,144,217,0.1);
+}
+.table-guest-row:last-child{border-bottom:none;}
+.table-guest-dot{width:5px;height:5px;border-radius:50%;background:var(--blue-bright);flex-shrink:0;}
+.table-guest-name{font-family:var(--font-body);font-size:0.88rem;color:var(--text);}
+.tables-empty{grid-column:1/-1;text-align:center;padding:2rem 0;}
+.tables-empty-icon{font-size:2rem;color:rgba(74,144,217,0.25);margin-bottom:0.6rem;}
+.tables-empty-text{font-family:var(--font-body);font-style:italic;font-size:1rem;color:var(--silver-dark);}
+
+/* ── IMPORT MODAL ── */
+#import-modal {
+  position:fixed;inset:0;z-index:950;
+  background:rgba(15,42,74,0.85);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;padding:1rem;
+}
+#import-modal.hidden{display:none!important;}
+.import-modal-box {
+  background:var(--white);border-radius:16px;padding:2rem 1.8rem;
+  width:100%;max-width:460px;
+  box-shadow:var(--shadow-hover);
+}
+.import-modal-title {
+  font-family:var(--font-serif);font-size:1.2rem;color:var(--text);
+  font-style:italic;margin-bottom:0.4rem;
+}
+.import-modal-sub {
+  font-family:var(--font-sans);font-size:0.7rem;color:var(--text-light);
+  margin-bottom:1rem;line-height:1.6;
+}
+.import-textarea {
+  width:100%;height:160px;
+  border:1.5px solid rgba(74,144,217,0.22);border-radius:8px;
+  padding:0.75rem;font-family:monospace;font-size:0.82rem;color:var(--text);
+  resize:vertical;outline:none;background:var(--blue-pale);
+}
+.import-textarea:focus{border-color:var(--blue-bright);}
+.import-actions{display:flex;gap:0.6rem;margin-top:1rem;flex-wrap:wrap;}
+
+/* UTILITIES */
+.hidden{display:none!important;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:480px){
+  .sf-main{padding:2rem 1.2rem 3.5rem;}
+  .sf-card-top{padding:1.2rem 1.4rem 1rem;}
+  .sf-companions{padding:1rem 1.4rem 1.3rem;}
+  .sf-card-name{font-size:1.25rem;}
+  .sf-result-card::before,.sf-result-card::after{display:none;}
+  .admin-panel{padding:1.5rem 1.2rem 2.5rem;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="star-canvas"></canvas>
+<div id="sparkles-wrap"></div>
+<div id="fb-status" class="fb-status syncing" title="Connecting…"></div>
+
+<!-- ── HEADER ── -->
+<header class="sf-header">
+  <p class="sf-header-eyebrow">You Are Cordially Invited</p>
+  <div class="sf-deco-line"><span>✦ ✦ ✦</span></div>
+  <h1 class="sf-header-title">Precious & Reyna</h1>
+  <p class="sf-header-sub">✦ &nbsp; Find Your Seat &nbsp; ✦</p>
+  <p class="sf-header-date">June 28, 2026 &nbsp;·&nbsp; Palazzo Marcelino, City of Santiago, Isabela</p>
+</header>
+
+<!-- ── MAIN ── -->
+<main class="sf-main">
+
+  <div class="sf-ribbon-deco">
+    <div class="sf-rd-side">
+      <div class="sf-rd-label">Precious</div>
+      
+    </div>
+    <div class="sf-rd-arrow">
+      <svg viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:44px">
+        <line x1="0" y1="10" x2="48" y2="10" stroke="rgba(74,144,217,0.4)" stroke-width="1" stroke-dasharray="4 3"/>
+        <polygon points="48,5 60,10 48,15" fill="rgba(74,144,217,0.45)"/>
+      </svg>
+      <span>June 2026</span>
+    </div>
+    <div class="sf-rd-side">
+      <div class="sf-rd-label">Reyna</div>
+      
+    </div>
+  </div>
+
+  <div class="sf-search-wrap">
+    <button class="sf-view-tables-btn" onclick="openTables()">
+      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13">
+        <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="11" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="1" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+        <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      View All Tables
+    </button>
+    <p class="sf-instruction">Type your name to find your<br>seat at the celebration.</p>
+    <div class="sf-search-box">
+      <svg class="sf-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+        <line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input
+        type="text"
+        class="sf-input"
+        id="sf-search"
+        placeholder="Type your name…"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        oninput="sfSearch()"
+        onkeydown="sfKey(event)"
+      />
+      <button class="sf-clear" id="sf-clear" onclick="sfClear()">✕</button>
+    </div>
+  </div>
+
+  <div class="sf-results" id="sf-results">
+    <div class="sf-idle">
+      <p class="sf-idle-text">Type your name to discover<br>your seat at the celebration.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="sf-footer">
+  <div class="sf-footer-logo">Precious & Reyna</div>
+  <p class="sf-footer-date">June 28, 2026 &nbsp;·&nbsp; ✦ &nbsp;·&nbsp; Palazzo Marcelino, Brgy. Sagana, City of Santiago, Isabela</p>
+  <p style="font-family:var(--font-sans);font-size:0.48rem;letter-spacing:0.22em;text-transform:uppercase;color:rgba(15,42,74,0.3);margin-top:0.35rem;">Made with love by Love &amp; Crafts</p>
+</footer>
+
+<!-- ── TABLES OVERLAY ── -->
+<div id="tables-overlay" class="hidden">
+  <div class="tables-panel">
+    <div class="tables-panel-header">
+      <div>
+        <p class="tables-eyebrow">Seating Chart</p>
+        <h2 class="tables-title">All Tables</h2>
+      </div>
+      <button class="tables-close" onclick="closeTables()">✕</button>
+    </div>
+    <div class="tables-grid" id="tables-grid"></div>
+  </div>
+</div>
+
+<!-- ── ADMIN OVERLAY ── -->
+<div id="admin-overlay" class="hidden" onclick="adminBackdrop(event)">
+  <div class="admin-panel">
+    <div class="admin-handle"></div>
+    <div class="admin-title">Manage Guest List</div>
+
+    <div class="afield">
+      <label>Guest Name</label>
+      <input type="text" id="admin-name" placeholder="e.g. Maria Santos" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Table</label>
+      <input type="text" id="admin-table" placeholder="e.g. Table 3 or VIP" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Seated With (comma-separated)</label>
+      <input type="text" id="admin-companions" placeholder="e.g. Jose Reyes, Ana Cruz" autocomplete="off"/>
+    </div>
+    <button class="btn-add-guest" onclick="addGuest()">+ Add Guest</button>
+
+    <div style="font-family:var(--font-sans);font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:0.4rem;">
+      Guest List <span id="guest-count" style="color:var(--blue-bright);"></span>
+    </div>
+
+    <!-- Admin list search -->
+    <div class="admin-search-row">
+      <svg width="14" height="14" viewBox="0 0 20 20" fill="none" style="color:var(--silver-dark);flex-shrink:0;">
+        <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.4"/>
+        <line x1="13" y1="13" x2="17" y2="17" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input type="text" class="admin-search-input" id="admin-filter" placeholder="Filter guests…" oninput="filterAdminList()" autocomplete="off"/>
+    </div>
+
+    <div class="admin-list-wrap" id="admin-list"></div>
+
+    <div class="admin-footer">
+      <button class="abtn abtn-export" onclick="exportData()">Export JSON</button>
+      <button class="abtn abtn-import" onclick="openImportModal()">Import JSON</button>
+      <button class="abtn abtn-clear" onclick="clearAll()">Clear All</button>
+      <button class="abtn abtn-close" onclick="closeAdmin()" style="width:100%;margin-top:0.5rem;text-align:center;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT MODAL ── -->
+<div id="edit-modal" class="hidden" onclick="editBackdrop(event)">
+  <div class="edit-modal-box">
+    <div class="edit-modal-title">Edit Guest</div>
+    <input type="hidden" id="edit-index"/>
+    <div class="afield">
+      <label>Guest Name</label>
+      <input type="text" id="edit-name" placeholder="e.g. Maria Santos" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Table</label>
+      <input type="text" id="edit-table" placeholder="e.g. Table 3" autocomplete="off"/>
+    </div>
+    <div class="afield">
+      <label>Seated With (comma-separated)</label>
+      <input type="text" id="edit-companions" placeholder="e.g. Jose Reyes, Ana Cruz" autocomplete="off"/>
+    </div>
+    <div class="edit-modal-actions">
+      <button class="btn-save-edit" onclick="saveEdit()">Save Changes</button>
+      <button class="btn-cancel-edit" onclick="closeEdit()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── IMPORT MODAL ── -->
+<div id="import-modal" class="hidden">
+  <div class="import-modal-box">
+    <div class="import-modal-title">Import Guest List</div>
+    <p class="import-modal-sub">Paste the contents of your JSON file below, then click Import. Each entry needs <code>"name"</code> and <code>"table"</code>.</p>
+    <textarea id="import-json-text" class="import-textarea" placeholder='[{"name":"Maria Santos","table":"Table 1","companions":["Jose Reyes"]}]'></textarea>
+    <div class="import-actions">
+      <button onclick="doImportPaste()" style="background:linear-gradient(135deg,var(--blue-deep),var(--blue-mid));color:#fff;border:none;padding:0.65rem 1.4rem;border-radius:8px;font-family:var(--font-sans);font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;">Import</button>
+      <button onclick="closeImportModal()" style="background:none;border:1px solid rgba(74,144,217,0.25);color:var(--text-light);padding:0.65rem 1.4rem;border-radius:8px;font-family:var(--font-sans);font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── FIREBASE SDK ── -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove, push, update }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+/* ── FIREBASE CONFIG ── */
+const firebaseConfig = {
+  apiKey:            "AIzaSyAOCAajmgf0X0ur756aIiO87sFFK0T5-48",
+  authDomain:        "reynaseatfinder.firebaseapp.com",
+  databaseURL:       "https://reynaseatfinder-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:         "reynaseatfinder",
+  storageBucket:     "reynaseatfinder.firebasestorage.app",
+  messagingSenderId: "946246052012",
+  appId:             "1:946246052012:web:f8fdcd6e0c6bd7188c1709",
+  measurementId:     "G-90YSL91TFR"
+};
+
+const app         = initializeApp(firebaseConfig);
+const db          = getDatabase(app);
+const GUESTS_REF  = ref(db, 'guests');
+
+/* ════════════════════════════════════════════
+   ANIMATED STARS CANVAS
+════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('star-canvas');
+  const ctx    = canvas.getContext('2d');
+  function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const BLUES = ['#4A90D9','#2E5FA3','#A8C5E8','#D6E8F7','#1B3A6B','#7AB3E0'];
+
+  class Star {
+    reset(){
+      this.x   = Math.random() * canvas.width;
+      this.y   = Math.random() * canvas.height;
+      this.r   = 0.5 + Math.random() * 1.8;
+      this.a   = 0;
+      this.da  = 0.003 + Math.random() * 0.008;
+      this.max = 0.15 + Math.random() * 0.35;
+      this.col = BLUES[Math.floor(Math.random() * BLUES.length)];
+    }
+    constructor(){ this.reset(); this.a = Math.random() * this.max; }
+    draw(){
+      ctx.save();
+      ctx.globalAlpha = this.a;
+      ctx.fillStyle   = this.col;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+    update(){
+      this.a += this.da;
+      if(this.a > this.max){ this.da = -Math.abs(this.da); }
+      if(this.a < 0)       { this.da =  Math.abs(this.da); this.a = 0; }
+    }
+  }
+
+  /* Drifting bubbles */
+  class Bubble {
+    reset(){
+      this.baseX = Math.random() * canvas.width;
+      this.y     = canvas.height + 60;
+      this.size  = 4 + Math.random() * 8;
+      this.dy    = -(0.25 + Math.random() * 0.55);
+      this.wx    = Math.random() * Math.PI * 2;
+      this.ws    = 0.015 + Math.random() * 0.02;
+      this.wa    = 25 + Math.random() * 45;
+      this.alpha = 0.05 + Math.random() * 0.12;
+      this.col   = BLUES[Math.floor(Math.random() * BLUES.length)];
+    }
+    constructor(){ this.reset(); this.y = Math.random() * canvas.height; }
+    draw(){
+      this.x = this.baseX + Math.sin(this.wx) * this.wa;
+      ctx.save();
+      ctx.globalAlpha = this.alpha;
+      ctx.strokeStyle = this.col;
+      ctx.lineWidth   = 1;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    update(){
+      this.wx += this.ws;
+      this.y  += this.dy;
+      if(this.y < -this.size*2) this.reset();
+    }
+  }
+
+  const stars   = Array.from({length:80},  () => new Star());
+  const bubbles = Array.from({length:10},  () => new Bubble());
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{s.update();s.draw();});
+    bubbles.forEach(b=>{b.update();b.draw();});
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ── FLOATING SPARKLES ── */
+(function(){
+  const wrap = document.getElementById('sparkles-wrap');
+  const syms = ['✦','✧','⋆','✩','·','✦'];
+  for(let i=0;i<12;i++){
+    const p = document.createElement('div');
+    p.className = 'sparkle';
+    p.textContent = syms[Math.floor(Math.random()*syms.length)];
+    p.style.cssText = `left:${5+Math.random()*90}%;top:-5%;font-size:${8+Math.random()*10}px;color:#4A90D9;animation-duration:${11+Math.random()*13}s;animation-delay:${Math.random()*18}s;`;
+    wrap.appendChild(p);
+  }
+})();
+
+/* ════════════════════════════════════════════
+   GUEST DATA
+════════════════════════════════════════════ */
+let guests  = [];
+let fbKeys  = [];
+let dbLoaded = false;
+
+/* Firebase status dot */
+function setStatus(state){
+  const el = document.getElementById('fb-status');
+  if(!el) return;
+  el.className = 'fb-status ' + state;
+  el.title = {
+    synced:  'Synced with Firebase',
+    syncing: 'Syncing…',
+    offline: 'Offline – changes saved locally'
+  }[state] || '';
+}
+
+/* Snapshot → arrays */
+function snapshotToGuests(data){
+  guests = []; fbKeys = [];
+  if(!data) return;
+  Object.keys(data).forEach(k => { fbKeys.push(k); guests.push(data[k]); });
+}
+
+/* ── PERMANENT REALTIME SYNC ── */
+function startRealtimeSync(){
+  onValue(GUESTS_REF, (snapshot) => {
+    snapshotToGuests(snapshot.val());
+    dbLoaded = true;
+    setStatus('synced');
+    renderAdminList();
+    updateGuestCount();
+    sfSearch();
+    if(!document.getElementById('tables-overlay').classList.contains('hidden')){
+      renderTables();
+    }
+  }, (err) => {
+    console.warn('Firebase read error', err);
+    setStatus('offline');
+    loadLocalFallback();
+  });
+}
+
+/* ── SAVE to Firebase ── */
+async function saveGuests(){
+  setStatus('syncing');
+  try{
+    const obj = {};
+    guests.forEach((g,i) => {
+      const k = fbKeys[i] || push(GUESTS_REF).key;
+      fbKeys[i] = k; obj[k] = g;
+    });
+    await set(GUESTS_REF, Object.keys(obj).length ? obj : null);
+    setStatus('synced');
+  } catch(err){
+    console.warn('Firebase write failed', err);
+    setStatus('offline');
+    localStorage.setItem('reyna_seatfinder_v1', JSON.stringify(guests));
+  }
+}
+
+/* ── LOCAL FALLBACK ── */
+function loadLocalFallback(){
+  try{
+    const raw = localStorage.getItem('reyna_seatfinder_v1');
+    guests = raw ? JSON.parse(raw) : [];
+    fbKeys = guests.map(() => null);
+  } catch(e){ guests = []; fbKeys = []; }
+  renderAdminList(); updateGuestCount(); sfSearch();
+}
+
+/* ── SEED if empty ── */
+async function seedIfEmpty(){
+  try{
+    const snap = await get(GUESTS_REF);
+    if(!snap.exists()){
+      guests = [];
+      await saveGuests();
+    }
+  } catch(e){}
+}
+
+/* ════════════════════════════════════════════
+   SEARCH
+════════════════════════════════════════════ */
+function sfSearch(){
+  const q     = document.getElementById('sf-search').value.trim();
+  const clear = document.getElementById('sf-clear');
+  const area  = document.getElementById('sf-results');
+
+  /* SECRET ADMIN PASSCODE */
+  if(q.toLowerCase() === 'admin1234'){
+    document.getElementById('sf-search').value = '';
+    clear.classList.remove('visible');
+    area.innerHTML = idleHTML();
+    openAdmin();
+    return;
+  }
+
+  clear.classList.toggle('visible', q.length > 0);
+  area.innerHTML = '';
+
+  if(!q){ area.innerHTML = idleHTML(); return; }
+
+  if(!dbLoaded){
+    area.innerHTML = `<div class="sf-empty"><div class="sf-empty-icon">✦</div><p class="sf-empty-text" style="font-size:0.9rem;opacity:0.6;">Loading guest list…</p></div>`;
+    return;
+  }
+
+  const matches = guests.filter(g => g.name.toLowerCase().includes(q.toLowerCase()));
+
+  if(!matches.length){
+    area.innerHTML = `<div class="sf-empty">
+      <div class="sf-empty-icon">✦</div>
+      <p class="sf-empty-text">No guest found for "<em>${esc(q)}</em>"</p>
+      <p class="sf-empty-sub">Please check your spelling<br>or ask the host for assistance.</p>
+    </div>`;
+    return;
+  }
+
+  matches.forEach((g, i) => {
+    const companions = (g.companions || []).filter(Boolean);
+    const pills = companions.length
+      ? companions.map(c => `<span class="sf-pill">${esc(c)}</span>`).join('')
+      : `<span style="font-family:var(--font-body);font-style:italic;font-size:0.9rem;color:var(--silver-dark);">Reserved for you alone</span>`;
+    const card = document.createElement('div');
+    card.className = 'sf-result-card';
+    card.style.animationDelay = `${i * 80}ms`;
+    card.innerHTML = `
+      <div class="sf-card-top">
+        <div class="sf-card-top-inner">
+          <div class="sf-card-label">Guest Name</div>
+          <div class="sf-card-name">${esc(g.name)}</div>
+        </div>
+        <div class="sf-badge">
+          <span class="sf-badge-label">Table</span>
+          <span class="sf-badge-value">${esc(g.table)}</span>
+        </div>
+      </div>
+      <div class="sf-companions">
+        <div class="sf-comp-label">Seated With</div>
+        <div class="sf-pills">${pills}</div>
+      </div>
+    `;
+    area.appendChild(card);
+  });
+}
+
+function idleHTML(){
+  return `<div class="sf-idle">
+    <p class="sf-idle-text">Type your name to discover<br>your seat at the celebration.</p>
+  </div>`;
+}
+
+function sfClear(){
+  document.getElementById('sf-search').value='';
+  document.getElementById('sf-clear').classList.remove('visible');
+  sfSearch();
+  document.getElementById('sf-search').focus();
+}
+function sfKey(e){ if(e.key==='Escape') sfClear(); }
+
+/* ════════════════════════════════════════════
+   ADMIN PANEL
+════════════════════════════════════════════ */
+function openAdmin(){
+  document.getElementById('admin-overlay').classList.remove('hidden');
+  document.getElementById('admin-filter').value = '';
+  renderAdminList();
+  updateGuestCount();
+}
+function closeAdmin(){ document.getElementById('admin-overlay').classList.add('hidden'); }
+function adminBackdrop(e){ if(e.target===e.currentTarget) closeAdmin(); }
+
+/* ── VIEW ALL TABLES ── */
+function openTables(){ renderTables(); document.getElementById('tables-overlay').classList.remove('hidden'); }
+function closeTables(){ document.getElementById('tables-overlay').classList.add('hidden'); }
+
+function renderTables(){
+  const grid = document.getElementById('tables-grid'); if(!grid) return;
+  if(!guests.length){
+    grid.innerHTML = `<div class="tables-empty"><div class="tables-empty-icon">✦</div><p class="tables-empty-text">No guests added yet</p></div>`;
+    return;
+  }
+  const map = {};
+  guests.forEach(g => { const k = g.table || 'Unassigned'; if(!map[k]) map[k]=[]; map[k].push(g.name); });
+  const sorted = Object.keys(map).sort((a,b) => {
+    const vA = a.toUpperCase().startsWith('VIP');
+    const vB = b.toUpperCase().startsWith('VIP');
+    if(vA && !vB) return -1;
+    if(!vA && vB) return 1;
+    return a.localeCompare(b, undefined, {numeric:true});
+  });
+  grid.innerHTML = sorted.map((table, i) => {
+    const names = map[table];
+    const rows = names.map(n => `<div class="table-guest-row"><div class="table-guest-dot"></div><span class="table-guest-name">${esc(n)}</span></div>`).join('');
+    return `<div class="table-card" style="animation-delay:${i*50}ms">
+      <div class="table-card-header">
+        <span class="table-card-name">${esc(table)}</span>
+        <span class="table-card-count">${names.length} guest${names.length!==1?'s':''}</span>
+      </div>
+      <div class="table-card-guests">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── ADD GUEST ── */
+async function addGuest(){
+  const n = document.getElementById('admin-name');
+  const t = document.getElementById('admin-table');
+  const c = document.getElementById('admin-companions');
+  const name = n.value.trim(), table = t.value.trim();
+  const companions = c.value.split(',').map(s => s.trim()).filter(Boolean);
+  if(!name || !table){ if(!name) flashInvalid(n); if(!table) flashInvalid(t); return; }
+  try{
+    setStatus('syncing');
+    const newRef = push(GUESTS_REF);
+    await set(newRef, {name, table, companions});
+    setStatus('synced');
+  } catch(err){
+    console.warn('Firebase push failed', err);
+    guests.push({name, table, companions}); fbKeys.push(null);
+    await saveGuests();
+    renderAdminList(); updateGuestCount(); sfSearch();
+  }
+  n.value=''; t.value=''; c.value=''; n.focus();
+}
+
+/* ── DELETE GUEST ── */
+async function deleteGuest(i){
+  if(!confirm(`Remove "${guests[i].name}"?`)) return;
+  const key = fbKeys[i];
+  if(key){
+    try{
+      setStatus('syncing');
+      await remove(ref(db, 'guests/' + key));
+      setStatus('synced');
+    } catch(err){
+      guests.splice(i,1); fbKeys.splice(i,1);
+      await saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+    }
+  } else {
+    guests.splice(i,1); fbKeys.splice(i,1);
+    await saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+  }
+}
+
+/* ── EDIT GUEST ── */
+function openEdit(i){
+  const g = guests[i];
+  document.getElementById('edit-index').value = i;
+  document.getElementById('edit-name').value  = g.name;
+  document.getElementById('edit-table').value = g.table;
+  document.getElementById('edit-companions').value = (g.companions || []).join(', ');
+  document.getElementById('edit-modal').classList.remove('hidden');
+  document.getElementById('edit-name').focus();
+}
+function closeEdit(){ document.getElementById('edit-modal').classList.add('hidden'); }
+function editBackdrop(e){ if(e.target===e.currentTarget) closeEdit(); }
+
+async function saveEdit(){
+  const i    = parseInt(document.getElementById('edit-index').value);
+  const name = document.getElementById('edit-name').value.trim();
+  const table= document.getElementById('edit-table').value.trim();
+  const companions = document.getElementById('edit-companions').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!name || !table){
+    if(!name)  flashInvalid(document.getElementById('edit-name'));
+    if(!table) flashInvalid(document.getElementById('edit-table'));
+    return;
+  }
+  const key = fbKeys[i];
+  try{
+    setStatus('syncing');
+    if(key){
+      await update(ref(db, 'guests/' + key), {name, table, companions});
+    } else {
+      guests[i] = {name, table, companions};
+      await saveGuests();
+    }
+    setStatus('synced');
+  } catch(err){
+    console.warn('Firebase update failed', err);
+    guests[i] = {name, table, companions};
+    await saveGuests();
+    renderAdminList(); updateGuestCount(); sfSearch();
+  }
+  closeEdit();
+}
+
+/* ── RENDER ADMIN LIST ── */
+function renderAdminList(filterText){
+  const list = document.getElementById('admin-list'); if(!list) return;
+  const q = (filterText ?? document.getElementById('admin-filter')?.value ?? '').toLowerCase();
+  const filtered = q ? guests.filter((g,_i) => g.name.toLowerCase().includes(q) || g.table.toLowerCase().includes(q)) : guests;
+
+  if(!guests.length){
+    list.innerHTML = `<p style="font-size:0.8rem;color:var(--silver-dark);padding:0.5rem 0;font-family:var(--font-sans);">No guests added yet.</p>`;
+    return;
+  }
+  if(!filtered.length){
+    list.innerHTML = `<p style="font-size:0.8rem;color:var(--silver-dark);padding:0.5rem 0;font-family:var(--font-sans);">No guests match your filter.</p>`;
+    return;
+  }
+  list.innerHTML = filtered.map((g) => {
+    const i = guests.indexOf(g);
+    return `
+    <div class="admin-row">
+      <div style="flex:1;min-width:0">
+        <div class="admin-row-name">${esc(g.name)}</div>
+        <div class="admin-row-meta">${esc(g.table)}${g.companions?.length?' · '+g.companions.length+' companion'+(g.companions.length>1?'s':''):''}</div>
+      </div>
+      <button class="btn-edit" onclick="openEdit(${i})" title="Edit">✎</button>
+      <button class="btn-del"  onclick="deleteGuest(${i})" title="Delete">✕</button>
+    </div>`;
+  }).join('');
+}
+
+function filterAdminList(){
+  const q = document.getElementById('admin-filter').value;
+  renderAdminList(q);
+}
+
+function updateGuestCount(){
+  const el=document.getElementById('guest-count');
+  if(el) el.textContent=`(${guests.length})`;
+}
+
+/* ── EXPORT ── */
+function exportData(){
+  const blob = new Blob([JSON.stringify(guests, null, 2)], {type:'application/json'});
+  const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(blob), download:'precious-reyna-guests.json'});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ── IMPORT MODAL ── */
+function openImportModal(){
+  document.getElementById('import-modal').classList.remove('hidden');
+  document.getElementById('import-json-text').value='';
+  document.getElementById('import-json-text').focus();
+}
+function closeImportModal(){ document.getElementById('import-modal').classList.add('hidden'); }
+
+async function doImportPaste(){
+  const raw = document.getElementById('import-json-text').value.trim();
+  if(!raw){ alert('Please paste JSON content first.'); return; }
+  try{
+    const data = JSON.parse(raw);
+    if(!Array.isArray(data)) throw new Error();
+    const clean = data.filter(g => g.name && g.table);
+    if(!clean.length){ alert('No valid guest entries found. Each entry needs "name" and "table".'); return; }
+    setStatus('syncing');
+    const obj = {}; clean.forEach(g => { obj[push(GUESTS_REF).key] = g; });
+    await set(GUESTS_REF, Object.keys(obj).length ? obj : null);
+    setStatus('synced');
+    closeImportModal();
+    alert(`✓ Imported ${clean.length} guest${clean.length!==1?'s':''} successfully!`);
+  } catch(err){ alert('Import failed — please paste a valid JSON array.'); }
+}
+
+/* ── CLEAR ALL ── */
+async function clearAll(){
+  if(!confirm('Remove ALL guests? This cannot be undone.')) return;
+  try{
+    setStatus('syncing');
+    await set(GUESTS_REF, null);
+    setStatus('synced');
+  } catch(err){
+    guests = []; fbKeys = [];
+    await saveGuests(); renderAdminList(); updateGuestCount(); sfSearch();
+  }
+}
+
+/* ── UTILS ── */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function flashInvalid(el){ el.style.borderColor='#b94040'; setTimeout(()=>(el.style.borderColor=''),1200); }
+
+/* ── EXPOSE GLOBALS ── */
+window.sfSearch=sfSearch; window.sfClear=sfClear; window.sfKey=sfKey;
+window.openAdmin=openAdmin; window.closeAdmin=closeAdmin; window.adminBackdrop=adminBackdrop;
+window.openTables=openTables; window.closeTables=closeTables;
+window.addGuest=addGuest; window.deleteGuest=deleteGuest;
+window.openEdit=openEdit; window.closeEdit=closeEdit; window.editBackdrop=editBackdrop; window.saveEdit=saveEdit;
+window.exportData=exportData; window.openImportModal=openImportModal; window.closeImportModal=closeImportModal; window.doImportPaste=doImportPaste;
+window.clearAll=clearAll; window.filterAdminList=filterAdminList;
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', async () => {
+  setStatus('syncing');
+  await seedIfEmpty();
+  startRealtimeSync();
+
+  /* Prefill from URL ?name= or ?n= */
+  const params = new URLSearchParams(window.location.search);
+  const pre = params.get('name') || params.get('n');
+  if(pre){
+    const input = document.getElementById('sf-search');
+    input.value = decodeURIComponent(pre);
+    document.getElementById('sf-clear').classList.add('visible');
+    sfSearch();
+  }
+
+  /* Backdrop click for tables overlay */
+  document.getElementById('tables-overlay').addEventListener('click', (e) => {
+    if(e.target === e.currentTarget) closeTables();
+  });
+
+  /* Keyboard shortcut: Escape closes open overlays */
+  document.addEventListener('keydown', (e) => {
+    if(e.key !== 'Escape') return;
+    if(!document.getElementById('edit-modal').classList.contains('hidden'))      { closeEdit();   return; }
+    if(!document.getElementById('import-modal').classList.contains('hidden'))    { closeImportModal(); return; }
+    if(!document.getElementById('admin-overlay').classList.contains('hidden'))   { closeAdmin();  return; }
+    if(!document.getElementById('tables-overlay').classList.contains('hidden'))  { closeTables(); return; }
+  });
+
+  /* Auto-focus */
+  setTimeout(() => document.getElementById('sf-search').focus(), 600);
+});
+</script>
+</body>
+</html>
