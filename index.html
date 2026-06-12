@@ -688,16 +688,7 @@ body::after {
   </div>
 
   <div class="sf-search-wrap">
-    <button class="sf-view-tables-btn" onclick="openTables()">
-      <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13">
-        <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
-        <rect x="11" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
-        <rect x="1" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
-        <rect x="11" y="11" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/>
-      </svg>
-      View All Tables
-    </button>
-    <p class="sf-instruction">Type your name to find your<br>seat at the celebration.</p>
+    <p class="sf-instruction">Type your name to find your<br>seat.</p>
     <div class="sf-search-box">
       <svg class="sf-search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
         <circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.4"/>
@@ -707,7 +698,7 @@ body::after {
         type="text"
         class="sf-input"
         id="sf-search"
-        placeholder="Type your name…"
+        placeholder="Type your name"
         autocomplete="off"
         autocorrect="off"
         spellcheck="false"
@@ -719,9 +710,7 @@ body::after {
   </div>
 
   <div class="sf-results" id="sf-results">
-    <div class="sf-idle">
-      <p class="sf-idle-text">Type your name to discover<br>your seat at the celebration.</p>
-    </div>
+
   </div>
 
 </main>
@@ -1095,9 +1084,7 @@ function sfSearch(){
 }
 
 function idleHTML(){
-  return `<div class="sf-idle">
-    <p class="sf-idle-text">Type your name to discover<br>your seat at the celebration.</p>
-  </div>`;
+  return `<div class="sf-idle"></div>`;
 }
 
 function sfClear(){
